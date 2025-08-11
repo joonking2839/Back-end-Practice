@@ -1,8 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
- <entry key="addTeam">
+  <entry key="createTeam">
      INSERT INTO MYTEAM (TEAM_NAME, BUDGET, TACTICS)
-     VALUES (?, ?, ?);
- </entry>
+     VALUES ( ? ,? ,?);
+  </entry>
+
+    <entry key="market">
+        SELECT P.PLAYER_ID, P.PLAYER_NAME, P.PLAYER_VALUE, P.PLAYER_POSITION, O.OPPONENT_NAME, P.PLAYER_CONTRIBUTION
+        FROM PLAYER
+        JOIN OTHER_TEAM O ON O.OPPONENT_ID = P.OPPONENT_ID
+        WHERE OPPONENT_ID IN (?, ?, ?, ?, ?)
+        AND PLAYER_ID NOT IN (
+        SELECT PLAYER_ID
+        FROM MY_TEAM_PLAYER
+        WHERE TEAM_ID = ?
+        );
+    </entry>
+    
+    <entry key="myPlayerRegister">
+        INSERT INTO MY_TEAM_PLAYER (TEAM_ID, PLAYER_ID, POSITION_SLOT)
+        VALUES (?, ?, ?);
+    </entry>
+
+    <entry key="myTeamBudget">
+        UPDATE MYTEAM
+        SET BUDGET = BUDGET + ?
+        WHERE TEAM_ID = ?;
+    </entry>
+
+    <entry key="myTeamLineup">
+        SELECT MTP.POSITION_SLOT, P.PLAYER_NAME, P.PLAYER_POSITION, P.PLAYER_VALUE P.PLAYER_CONTRIBUTION
+        FROM MY_TEAM_PLAYER MTP
+        JOIN PLAYER P ON P.PLAYER_ID = MTP.PLAYER_ID
+        WHERE MTP.TEAM_ID = ?
+        ORDER BY MTP.POSITION_SLOT;
+    </entry>
 </properties>
