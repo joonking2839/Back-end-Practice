@@ -15,6 +15,12 @@ public class TeamDTO {
         this.TACTICS = TACTICS;
     }
 
+    public TeamDTO(String TEAM_NAME, int BUDGET, String TACTICS) {
+        this.TEAM_NAME = TEAM_NAME;
+        this.BUDGET = BUDGET;
+        this.TACTICS = TACTICS;
+    }
+
     public int getTEAM_ID() {
         return TEAM_ID;
     }

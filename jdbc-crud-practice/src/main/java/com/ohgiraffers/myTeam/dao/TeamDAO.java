@@ -1,44 +1,54 @@
 package com.ohgiraffers.myTeam.dao;
 
+import com.ohgiraffers.myTeam.dto.TeamDTO;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
 import static com.ohgiraffers.common.JDBCTemplate.close;
 
 public class TeamDAO {
-    private final Properties prop = new Properties();
+
+    private Properties prop = new Properties();
 
     public TeamDAO() {
         try {
-            prop.loadFromXML(new FileInputStream("src/main/java/com/ohgiraffers/mapper/menu-query.xml"));
+            prop.loadFromXML(new FileInputStream("src/main/java/com/ohgiraffers/mapper/team-query.xml"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public int createTeam(Connection con, String TEAM_NAME, int BUDGET, String TACTICS) {
-        PreparedStatement pstmt = null;
-        int result = 0;
-
-        String query = prop.getProperty("createTeam");
-
+    public int createTeam(TeamDTO newTeam, Connection con) {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
-            pstmt = con.prepareStatement(query);
-            pstmt.setString(1, TEAM_NAME);
-            pstmt.setInt(2, BUDGET);
-            pstmt.setString(3, TACTICS);
+            String insert = prop.getProperty("createTeam");
+            ps = con.prepareStatement(insert);
+            ps.setString(1, newTeam.getTEAM_NAME());
+            ps.setInt(2, newTeam.getBUDGET());
+            ps.setString(3, newTeam.getTACTICS());
+            int r = ps.executeUpdate();
+            close(ps);
+            if (r != 1) return 0;
 
-            result = pstmt.executeUpdate();
+            ps = con.prepareStatement(prop.getProperty("team.lastInsertId")); // SELECT LAST_INSERT_ID() AS TEAM_ID
+            rs = ps.executeQuery();
+            if (rs.next()) newTeam.setTEAM_ID(rs.getInt("TEAM_ID"));
+            else return 0;
+
+            return 1;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            close(pstmt);
+            close(rs);
+            close(ps);
         }
-        return result;
     }
-}
 
+}

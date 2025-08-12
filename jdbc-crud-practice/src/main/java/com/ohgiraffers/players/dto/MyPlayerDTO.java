@@ -1,15 +1,23 @@
-package com.ohgiraffers.myTeamPlayer.dto;
+package com.ohgiraffers.players.dto;
 
-public class MyTeamPlayersDTO {
+public class MyPlayerDTO {
+    private int POSITION_SLOT;
     private int TEAM_ID;
     private int PLAYER_ID;
-    private String POSITION_SLOT;
 
-    public MyTeamPlayersDTO(){}
+    public MyPlayerDTO(){}
 
-    public MyTeamPlayersDTO(int TEAM_ID, int PLAYER_ID, String POSITION_SLOT) {
+    public MyPlayerDTO(int POSITION_SLOT, int TEAM_ID, int PLAYER_ID) {
+        this.POSITION_SLOT = POSITION_SLOT;
         this.TEAM_ID = TEAM_ID;
         this.PLAYER_ID = PLAYER_ID;
+    }
+
+    public int getPOSITION_SLOT() {
+        return POSITION_SLOT;
+    }
+
+    public void setPOSITION_SLOT(int POSITION_SLOT) {
         this.POSITION_SLOT = POSITION_SLOT;
     }
 
@@ -29,20 +37,12 @@ public class MyTeamPlayersDTO {
         this.PLAYER_ID = PLAYER_ID;
     }
 
-    public String getPOSITION_SLOT() {
-        return POSITION_SLOT;
-    }
-
-    public void setPOSITION_SLOT(String POSITION_SLOT) {
-        this.POSITION_SLOT = POSITION_SLOT;
-    }
-
     @Override
     public String toString() {
-        return "MyTeamPlayersDTO{" +
-                "TEAM_ID=" + TEAM_ID +
+        return "MyPlayerDTO{" +
+                "POSITION_SLOT=" + POSITION_SLOT +
+                ", TEAM_ID=" + TEAM_ID +
                 ", PLAYER_ID=" + PLAYER_ID +
-                ", POSITION_SLOT='" + POSITION_SLOT + '\'' +
                 '}';
     }
 }

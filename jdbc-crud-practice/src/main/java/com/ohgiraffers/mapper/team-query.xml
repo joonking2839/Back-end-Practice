@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <!--팀 생성-->
+    <entry key="createTeam">
+        INSERT INTO MYTEAM (TEAM_NAME, BUDGET, TACTICS)
+        VALUES (?, ?, ?)
+    </entry>
+
+    <!--팀 아이디-->
+    <entry key="team.lastInsertId">
+    SELECT LAST_INSERT_ID() AS TEAM_ID
+    </entry>
+    <!--선수 리스트 이적시장-->
+    <entry key="market">
+        SELECT p.PLAYER_ID, p.PLAYER_NAME, p.PLAYER_VALUE, p.PLAYER_POSITION,
+        o.OPPONENT_NAME, p.PLAYER_CONTRIBUTION
+        FROM PLAYER p
+        JOIN OTHER_TEAM o ON o.OPPONENT_ID = p.OPPONENT_ID
+        WHERE p.PLAYER_ID NOT IN (
+        SELECT PLAYER_ID FROM MY_TEAM_PLAYER WHERE TEAM_ID = ?
+        )
+    </entry>
+    <!--보유 등록-->
+    <entry key="my.insert">
+    INSERT INTO MY_TEAM_PLAYER (TEAM_ID, PLAYER_ID, POSITION_SLOT)
+    VALUES (?, ?, ?)
+    </entry>
+    <!-- 예산 업데이트 -->
+    <entry key="team.updateBudget">
+    UPDATE MYTEAM SET BUDGET = BUDGET - ? WHERE TEAM_ID = ?
+    </entry>
+    <!--선수 정보-->
+    <entry key="player.byId">
+    SELECT PLAYER_ID, PLAYER_NAME, PLAYER_VALUE, PLAYER_POSITION
+      FROM PLAYER
+     WHERE PLAYER_ID = ?
+     </entry>
+
+    <entry key="team.budgetById">
+    SELECT BUDGET FROM MYTEAM WHERE TEAM_ID = ?
+    </entry>
+
+</properties>

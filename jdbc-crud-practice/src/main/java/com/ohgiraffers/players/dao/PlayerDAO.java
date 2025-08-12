@@ -1,0 +1,75 @@
+package com.ohgiraffers.players.dao;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
+import static com.ohgiraffers.common.JDBCTemplate.close;
+
+public class PlayerDAO {
+
+    private Properties prop = new Properties();
+
+    public PlayerDAO(){
+        try {
+            prop.loadFromXML(new FileInputStream("src/main/java/com/ohgiraffers/mapper/team-query.xml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Map<String,Object>> market(Connection con, int TEAM_ID){
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        String query =prop.getProperty("market");
+
+        List<Map<String,Object>> list = new ArrayList<>();
+
+        try {
+            pstmt = con.prepareStatement(query);
+            pstmt.setInt(1,TEAM_ID);
+            rset = pstmt.executeQuery();
+            while (rset.next()){
+                Map<String,Object> row = new LinkedHashMap<>();
+                row.put("PLAYER_ID", rset.getInt("PLAYER_ID"));
+                row.put("PLAYER_NAME", rset.getString("PLAYER_NAME"));
+                row.put("PLAYER_VALUE", rset.getInt("PLAYER_VALUE"));
+                row.put("PLAYER_POSITION", rset.getString("PLAYER_POSITION"));
+                row.put("OPPONENT_NAME", rset.getString("OPPONENT_NAME"));
+                row.put("PLAYER_CONTRIBUTION", rset.getDouble("PLAYER_CONTRIBUTION"));
+                list.add(row);
+            }return list;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(rset);
+            close(pstmt);
+        }
+    }
+    //선수 추가
+    public int insertIntoMyTeam(Connection con, int TEAM_ID, int PLAYER_ID, int POSITION_SLOT ) {
+        PreparedStatement ps =null;
+
+        int result =0;
+
+        String sql = prop.getProperty("my.insert");
+        try  {
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, TEAM_ID);
+            ps.setInt(2, PLAYER_ID);
+            ps.setInt(3, POSITION_SLOT);
+
+            result = ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(ps);
+        } return result;
+    }
+
+}

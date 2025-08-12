@@ -1,17 +1,17 @@
 package com.ohgiraffers.players.dto;
 
-public class PlayersDTO {
-    private int PLAYER_Id;
+public class PlayerDTO {
+    private int PLAYER_ID;
     private String PLAYER_NAME;
     private int PLAYER_VALUE;
     private String PLAYER_POSITION;
     private int OPPONENT_ID;
     private float PLAYER_CONTRIBUTION;
 
-    public PlayersDTO(){}
+    PlayerDTO(){}
 
-    public PlayersDTO(int PLAYER_Id, String PLAYER_NAME, int PLAYER_VALUE, String PLAYER_POSITION, int OPPONENT_ID, float PLAYER_CONTRIBUTION) {
-        this.PLAYER_Id = PLAYER_Id;
+    public PlayerDTO(int PLAYER_ID, String PLAYER_NAME, int PLAYER_VALUE, String PLAYER_POSITION, int OPPONENT_ID, float PLAYER_CONTRIBUTION) {
+        this.PLAYER_ID = PLAYER_ID;
         this.PLAYER_NAME = PLAYER_NAME;
         this.PLAYER_VALUE = PLAYER_VALUE;
         this.PLAYER_POSITION = PLAYER_POSITION;
@@ -19,12 +19,19 @@ public class PlayersDTO {
         this.PLAYER_CONTRIBUTION = PLAYER_CONTRIBUTION;
     }
 
-    public int getPLAYER_Id() {
-        return PLAYER_Id;
+    public PlayerDTO(int PLAYER_ID, String PLAYER_NAME, int PLAYER_VALUE, String PLAYER_POSITION) {
+        this.PLAYER_ID = PLAYER_ID;
+        this.PLAYER_NAME = PLAYER_NAME;
+        this.PLAYER_VALUE = PLAYER_VALUE;
+        this.PLAYER_POSITION = PLAYER_POSITION;
     }
 
-    public void setPLAYER_Id(int PLAYER_Id) {
-        this.PLAYER_Id = PLAYER_Id;
+    public int getPLAYER_ID() {
+        return PLAYER_ID;
+    }
+
+    public void setPLAYER_ID(int PLAYER_ID) {
+        this.PLAYER_ID = PLAYER_ID;
     }
 
     public String getPLAYER_NAME() {
@@ -69,8 +76,8 @@ public class PlayersDTO {
 
     @Override
     public String toString() {
-        return "PlayersDTO{" +
-                "PLAYER_Id=" + PLAYER_Id +
+        return "PlayerDTO{" +
+                "PLAYER_ID=" + PLAYER_ID +
                 ", PLAYER_NAME='" + PLAYER_NAME + '\'' +
                 ", PLAYER_VALUE=" + PLAYER_VALUE +
                 ", PLAYER_POSITION='" + PLAYER_POSITION + '\'' +
