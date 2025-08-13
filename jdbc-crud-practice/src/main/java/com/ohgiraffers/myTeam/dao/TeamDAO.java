@@ -78,11 +78,24 @@ public class TeamDAO {
         }
     }
 
-    public void startGame(){
+    public double startGame(Connection con,int TEAM_ID) {
         PreparedStatement ps = null;
         ResultSet rs = null;
-        double sum = 0.0;
+
+        String query = prop.getProperty("game");
+
+        try {
+            ps = con.prepareStatement(query);
+            ps.setInt(1, TEAM_ID);
+            rs = ps.executeQuery();
+            rs.next();
+
+            return rs.getDouble("SUM_CTR");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(rs);
+            close(ps);
+        }
     }
-
-
 }
