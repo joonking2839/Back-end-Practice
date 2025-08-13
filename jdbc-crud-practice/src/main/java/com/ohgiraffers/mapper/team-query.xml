@@ -11,6 +11,7 @@
     <entry key="team.lastInsertId">
     SELECT LAST_INSERT_ID() AS TEAM_ID
     </entry>
+
     <!--선수 리스트 이적시장-->
     <entry key="market">
         SELECT p.PLAYER_ID, p.PLAYER_NAME, p.PLAYER_VALUE, p.PLAYER_POSITION,
@@ -26,19 +27,55 @@
     INSERT INTO MY_TEAM_PLAYER (TEAM_ID, PLAYER_ID, POSITION_SLOT)
     VALUES (?, ?, ?)
     </entry>
-    <!-- 예산 업데이트 -->
+    <!-- 예산 업데이트 (구현실패)-->
     <entry key="team.updateBudget">
     UPDATE MYTEAM SET BUDGET = BUDGET - ? WHERE TEAM_ID = ?
     </entry>
-    <!--선수 정보-->
-    <entry key="player.byId">
-    SELECT PLAYER_ID, PLAYER_NAME, PLAYER_VALUE, PLAYER_POSITION
-      FROM PLAYER
-     WHERE PLAYER_ID = ?
-     </entry>
 
+    <!--구현 실패-->
     <entry key="team.budgetById">
     SELECT BUDGET FROM MYTEAM WHERE TEAM_ID = ?
     </entry>
+
+    <!-- 슬롯별 선수 이름 -->
+    <entry key="my.lineupByTeam">
+        SELECT m.POSITION_SLOT AS SLOT,
+        p.PLAYER_NAME
+        FROM MY_TEAM_PLAYER m
+        JOIN PLAYER p ON p.PLAYER_ID = m.PLAYER_ID
+        WHERE m.TEAM_ID = ?
+        ORDER BY SLOT;
+   </entry>
+
+    <!--내 팀 정보-->
+    <entry key="team.info">
+      SELECT
+       TEAM_NAME,
+       BUDGET,
+       TACTICS
+      FROM MYTEAM
+      WHERE TEAM_ID = ?
+    </entry>
+
+   <!--선수 교체-->
+    <entry key="my.updateBySlot">
+     UPDATE MY_TEAM_PLAYER
+        SET PLAYER_ID = ?
+      WHERE TEAM_ID = ? AND POSITION_SLOT = ?
+    </entry>
+
+    <!--선수 방출-->
+    <entry key="my.deleteBySlot">
+        DELETE FROM MY_TEAM_PLAYER
+        WHERE TEAM_ID = ? AND POSITION_SLOT = ?
+   </entry>
+
+    <!--게임-->
+<entry key="game">
+    SELECT SUM(p.PLAYER_CONTRIBUTION) AS SUM_CTR
+    FROM MY_TEAM_PLAYER m
+    JOIN PLAYER p ON p.PLAYER_ID = m.PLAYER_ID
+    WHERE m.TEAM_ID = ?
+</entry>
 
 </properties>

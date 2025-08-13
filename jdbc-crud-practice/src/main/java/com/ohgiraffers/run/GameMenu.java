@@ -23,7 +23,7 @@ public class GameMenu {
     }
 
     public void start() {
-        createTeam();   // 1. 팀 생성
+         createTeam(); // 1. 팀 생성
 
         // 2. 메뉴 루프
         while (true) {
@@ -129,25 +129,6 @@ public class GameMenu {
 
     }
 
-    private void swapPlayer() {
-        System.out.println("[선수 교체 기능 - 구현 예정]");
-    }
-
-    private void removePlayer() {
-        System.out.println("[선수 방출 기능 - 구현 예정]");
-    }
-
-    private void showMyInfo() {
-        System.out.println("[내 정보 조회]");
-        System.out.println("팀명: " + myTeam.getTEAM_NAME());
-        System.out.println("예산: " + myTeam.getBUDGET());
-        System.out.println("전술: " + myTeam.getTACTICS());
-    }
-
-    private void startGame() {
-        System.out.println("[게임 시작 기능 - 구현 예정]");
-    }
-
     private void printNumberedBoard(String tactics) {
         System.out.println();
         if ("433".equals(tactics)) {
@@ -177,5 +158,118 @@ public class GameMenu {
         System.out.println(    "|=============================================|");
         System.out.println();
     }
+    private void swapPlayer() {
+        List<Map<String, Object>> list = playerDAO.market(con,myTeam.getTEAM_ID());     //*선수를 구매할때 내가 보유한 선수는 제외해야 함으로 내 팀 아이디가 필요함.;
+        if (list.isEmpty()) {
+            System.out.println("마켓에 선수가 없습니다.")
+            ;}
 
-}
+        System.out.println("+----+------------+---------+----------+--------------+--------+");
+        System.out.println("| ID | 이름       | 포지션  |   가치   | 팀           | 기여도 |");
+        System.out.println("+----+------------+---------+----------+--------------+--------+");
+        for (Map<String,Object> r : list) {
+            System.out.printf("| %-2d | %-10s | %-7s | %,8d | %-12s | %.2f |\n",
+                    //길이2의 크기를 가진 번호 표시,문자열 왼쪽 정렬 길이 10칸,문자열 7칸,오른쪽 문자 정렬 8칸,길이 12의 숫자,소수점 2까지의 길이
+                    r.get("PLAYER_ID"), r.get("PLAYER_NAME"),
+                    r.get("PLAYER_POSITION"), r.get("PLAYER_VALUE"),
+                    r.get("OPPONENT_NAME"), r.get("PLAYER_CONTRIBUTION"));
+        }
+        System.out.println("+----+------------+---------+----------+--------------+--------+");
+
+        System.out.print("\n영입하고 교체할 선수 ID(이미 보유한 선수 id x): ");
+        int pid = sc.nextInt();
+        sc.nextLine();
+
+        printNumberedBoard(myTeam.getTACTICS());
+        System.out.print("어디에 선수를 배정할 것인지 선택해주세요.(1~11 숫자): ");
+        int slot = sc.nextInt();
+        sc.nextLine();
+
+        if (slot<1 || slot>11){
+            System.out.println("1부터11까지의 숫자만 선택 해 주세요!");
+        }
+
+        int update = playerDAO.updatePlayer(con,myTeam.getTEAM_ID(), pid, slot);
+
+        if (update == 1) {
+            System.out.println("교체 완료! 슬롯 "+ slot);
+        } else {
+            System.out.println("선수 교체 실패!");
+        }
+    }
+
+    private void removePlayer() {
+        printNumberedBoard(myTeam.getTACTICS());
+
+        System.out.println("삭제할 슬롯 번호(1~11)");
+        int slot = sc.nextInt();
+        sc.nextLine();
+
+        if (slot<1 || slot>11){
+            System.out.println("1부터11까지의 숫자만 선택 해 주세요!");
+        }
+
+        int rm = playerDAO.deleteBySlot(con,myTeam.getTEAM_ID(), slot);
+
+        if (rm == 1) {
+            System.out.println("슬롯 " + slot + " 방출 완료.");
+        } else {
+            System.out.println("비어있는 슬롯");
+        }
+
+    }
+    private void startGame() {
+        System.out.println("[게임 시작 기능 - 구현 예정]");
+    }
+
+    private void showMyInfo() {
+        System.out.println("[내 정보 조회]");
+
+        String t =myTeam.getTACTICS();
+        //빈자리
+        String[] name = new String[12];
+        if ("433".equals(t)) {
+            name[1] = name[2] = name[3] =           "    FW   ";
+            name[4] = name[5] = name[6] =           "    MF   ";
+        } else { // 442, 4222 공통
+            name[1] = name[2] =                     "    FW   ";
+            name[3] = name[4] = name[5] = name[6] = "    MF   ";
+        }
+        name[7] = name[8] = name[9] = name[10] =    "    DF   ";
+        name[11] =                                  "    GK   ";
+
+        Map<Integer, String> lineup = playerDAO.lineup(con, myTeam.getTEAM_ID());
+        //entrySet()메서드는 Map에서 모든 Entry(Key-Value쌍)를가져와Set객체로 반환
+        for (Map.Entry<Integer, String> e : lineup.entrySet()) {
+            int slot = e.getKey();
+            if (slot >= 1 && slot <= 11) name[slot] = e.getValue();
+        }
+            System.out.println("|================================================================================|");
+        if ("433".equals(t)) {
+            System.out.println("|                     ["+name[1]+"]   ["+name[2]+"]   ["+name[3]+"]                    |"                );
+            System.out.println("|                                                                                |");
+            System.out.println("|                     ["+name[4]+"]   ["+name[5]+"]   ["+name[6]+"]                    |");
+        } else if ("442".equals(t)) {
+            System.out.println("|                             ["+name[1]+"]   ["+name[2]+"]                         |");
+            System.out.println("|                                                                                |");
+            System.out.println("|             ["+name[3]+"]   ["+name[4]+"]   ["+name[5]+"]   ["+name[6]+"]                 |");
+        } else { // 4222
+            System.out.println("|                             ["+name[1]+"]   ["+name[2]+"]                            |");
+            System.out.println("|                                                                                |");
+            System.out.println("|             ["+name[3]+"]   ["+name[4]+"]   ["+name[5]+"]   ["+name[6]+"]            |");
+        }
+            System.out.println("|                                                                                |");
+            System.out.println("|             ["+name[7]+"]   ["+name[8]+"]   ["+name[9]+"]   ["+name[10]+"]              |");
+            System.out.println("|                                                                                |");
+            System.out.println("|                                   ["+name[11]+"]                                  |");
+            System.out.println("|================================================================================|");
+
+        Map<String,Object> info = teamDAO.myInfo(con, myTeam.getTEAM_ID());
+
+        System.out.println("팀명: " + info.get("TEAM_NAME"));
+        System.out.println("예산: " + info.get("BUDGET"));
+        System.out.println("전술: " + info.get("TACTICS"));
+        System.out.println();
+
+    }
+    }

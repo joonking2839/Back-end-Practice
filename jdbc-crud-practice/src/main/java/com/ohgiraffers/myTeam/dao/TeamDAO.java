@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import static com.ohgiraffers.common.JDBCTemplate.close;
@@ -35,9 +37,10 @@ public class TeamDAO {
             ps.setString(3, newTeam.getTACTICS());
             int r = ps.executeUpdate();
             close(ps);
+
             if (r != 1) return 0;
 
-            ps = con.prepareStatement(prop.getProperty("team.lastInsertId")); // SELECT LAST_INSERT_ID() AS TEAM_ID
+            ps = con.prepareStatement(prop.getProperty("team.lastInsertId"));
             rs = ps.executeQuery();
             if (rs.next()) newTeam.setTEAM_ID(rs.getInt("TEAM_ID"));
             else return 0;
@@ -50,5 +53,36 @@ public class TeamDAO {
             close(ps);
         }
     }
+
+    public Map<String,Object> myInfo(Connection con, int TEAM_ID) {
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        String query = prop.getProperty("team.info");
+
+        Map<String,Object> row = new LinkedHashMap<>();
+        try {
+            pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, TEAM_ID);
+            rset = pstmt.executeQuery();
+            if (rset.next()) {
+                row.put("TEAM_NAME", rset.getString("TEAM_NAME"));
+                row.put("BUDGET", rset.getInt("BUDGET"));
+                row.put("TACTICS", rset.getString("TACTICS"));
+            }
+            return row;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(rset);
+            close(pstmt);
+        }
+    }
+
+    public void startGame(){
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        double sum = 0.0;
+    }
+
 
 }
